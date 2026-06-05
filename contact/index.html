@@ -19,8 +19,113 @@
     <main class="page-shell">
       <section class="page-heading">
         <h1>Contact</h1>
-        <p>Use this page for class inquiries, scheduling, and questions about the courses.</p>
+        <p>Ask a question, share what your student wants to build, or request a lesson time.</p>
+      </section>
+
+      <section class="contact-layout" aria-label="Contact options">
+        <form
+          class="inquiry-form"
+          id="lesson-inquiry-form"
+          action="mailto:helios.cch@gmail.com?subject=Code%20with%20Helios%20lesson%20inquiry"
+          method="post"
+          enctype="text/plain"
+          data-contact-email="helios.cch@gmail.com"
+        >
+          <div class="form-grid">
+            <label>
+              Parent or guardian name
+              <input name="name" type="text" autocomplete="name" required>
+            </label>
+
+            <label>
+              Email
+              <input name="email" type="email" autocomplete="email" required>
+            </label>
+
+            <label>
+              Student age
+              <input name="studentAge" type="text" inputmode="numeric" autocomplete="off">
+            </label>
+
+            <label>
+              I want to
+              <select name="requestType" required>
+                <option value="">Choose one</option>
+                <option>Ask a course question</option>
+                <option>Book a trial lesson</option>
+                <option>Schedule weekly lessons</option>
+                <option>Get help choosing a course</option>
+              </select>
+            </label>
+
+            <label>
+              Course interest
+              <select name="courseInterest">
+                <option>Not sure yet</option>
+                <option>Scratch Beginner</option>
+                <option>Scratch Game Design</option>
+                <option>Scratch Animation</option>
+                <option>Scratch Advanced Games</option>
+              </select>
+            </label>
+
+            <label>
+              Preferred time
+              <input name="preferredTime" type="text" placeholder="Weekday afternoons, weekends, etc.">
+            </label>
+          </div>
+
+          <label>
+            Question or lesson goal
+            <textarea name="message" rows="6" placeholder="Tell us what your student wants to make or what you would like to know." required></textarea>
+          </label>
+
+          <button class="button" type="submit">Send Inquiry</button>
+          <p class="form-note" id="form-note" aria-live="polite"></p>
+        </form>
+
+        <aside class="contact-note" aria-label="Lesson details">
+          <h2>Lesson Inquiries</h2>
+          <p>
+            Code with Helios teaches Scratch through hands-on projects, including games,
+            animations, and creative coding foundations.
+          </p>
+          <ul>
+            <li>One-on-one Scratch lessons</li>
+            <li>Beginner-friendly project planning</li>
+            <li>Game, animation, and advanced project tracks</li>
+          </ul>
+        </aside>
       </section>
     </main>
+
+    <script>
+      const inquiryForm = document.querySelector("#lesson-inquiry-form");
+      const formNote = document.querySelector("#form-note");
+      const contactEmail = inquiryForm.dataset.contactEmail;
+
+      inquiryForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(inquiryForm);
+        const lines = [
+          `Name: ${formData.get("name")}`,
+          `Email: ${formData.get("email")}`,
+          `Student age: ${formData.get("studentAge") || "Not provided"}`,
+          `Request type: ${formData.get("requestType")}`,
+          `Course interest: ${formData.get("courseInterest")}`,
+          `Preferred time: ${formData.get("preferredTime") || "Not provided"}`,
+          "",
+          "Question or lesson goal:",
+          formData.get("message")
+        ];
+
+        const subject = encodeURIComponent("Code with Helios lesson inquiry");
+        const body = encodeURIComponent(lines.join("\n"));
+
+        formNote.textContent = "Opening your email app with the inquiry details.";
+        window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+      });
+    </script>
   </body>
 </html>
