@@ -27,15 +27,19 @@
         <form
           class="inquiry-form"
           id="lesson-inquiry-form"
-          action="mailto:helios.cch@gmail.com?subject=Code%20with%20Helios%20lesson%20inquiry"
+          action="https://formsubmit.co/helios.cch@gmail.com"
           method="post"
-          enctype="text/plain"
-          data-contact-email="helios.cch@gmail.com"
+          data-submit-endpoint="https://formsubmit.co/ajax/helios.cch@gmail.com"
         >
+          <input type="hidden" name="_subject" value="Code with Helios lesson inquiry">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <input class="honey-field" type="text" name="_honey" tabindex="-1" autocomplete="off">
+
           <div class="form-grid">
             <label>
               Parent or guardian name
-              <input name="name" type="text" autocomplete="name" required>
+              <input name="Parent or guardian name" type="text" autocomplete="name" required>
             </label>
 
             <label>
@@ -45,12 +49,12 @@
 
             <label>
               Student age
-              <input name="studentAge" type="text" inputmode="numeric" autocomplete="off">
+              <input name="Student age" type="text" inputmode="numeric" autocomplete="off">
             </label>
 
             <label>
               I want to
-              <select name="requestType" required>
+              <select name="Request type" required>
                 <option value="">Choose one</option>
                 <option>Ask a course question</option>
                 <option>Book a trial lesson</option>
@@ -61,7 +65,7 @@
 
             <label>
               Course interest
-              <select name="courseInterest">
+              <select name="Course interest">
                 <option>Not sure yet</option>
                 <option>Scratch Beginner</option>
                 <option>Scratch Game Design</option>
@@ -72,13 +76,13 @@
 
             <label>
               Preferred time
-              <input name="preferredTime" type="text" placeholder="Weekday afternoons, weekends, etc.">
+              <input name="Preferred time" type="text" placeholder="Weekday afternoons, weekends, etc.">
             </label>
           </div>
 
           <label>
             Question or lesson goal
-            <textarea name="message" rows="6" placeholder="Tell us what your student wants to make or what you would like to know." required></textarea>
+            <textarea name="Question or lesson goal" rows="6" placeholder="Tell us what your student wants to make or what you would like to know." required></textarea>
           </label>
 
           <button class="button" type="submit">Send Inquiry</button>
@@ -103,29 +107,37 @@
     <script>
       const inquiryForm = document.querySelector("#lesson-inquiry-form");
       const formNote = document.querySelector("#form-note");
-      const contactEmail = inquiryForm.dataset.contactEmail;
 
       inquiryForm.addEventListener("submit", (event) => {
         event.preventDefault();
 
         const formData = new FormData(inquiryForm);
-        const lines = [
-          `Name: ${formData.get("name")}`,
-          `Email: ${formData.get("email")}`,
-          `Student age: ${formData.get("studentAge") || "Not provided"}`,
-          `Request type: ${formData.get("requestType")}`,
-          `Course interest: ${formData.get("courseInterest")}`,
-          `Preferred time: ${formData.get("preferredTime") || "Not provided"}`,
-          "",
-          "Question or lesson goal:",
-          formData.get("message")
-        ];
+        const submitButton = inquiryForm.querySelector("button[type='submit']");
 
-        const subject = encodeURIComponent("Code with Helios lesson inquiry");
-        const body = encodeURIComponent(lines.join("\n"));
+        submitButton.disabled = true;
+        formNote.textContent = "Sending your inquiry...";
 
-        formNote.textContent = "Opening your email app with the inquiry details.";
-        window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+        fetch(inquiryForm.dataset.submitEndpoint, {
+          method: "POST",
+          headers: {
+            Accept: "application/json"
+          },
+          body: formData
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("The inquiry could not be sent.");
+            }
+
+            inquiryForm.reset();
+            formNote.textContent = "Thanks. Your inquiry was sent to Code with Helios.";
+          })
+          .catch(() => {
+            formNote.textContent = "Sorry, the inquiry could not be sent. Please try again in a moment.";
+          })
+          .finally(() => {
+            submitButton.disabled = false;
+          });
       });
     </script>
   </body>
